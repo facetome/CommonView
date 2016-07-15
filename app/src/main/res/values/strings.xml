@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CommonView</string>
+    <string name="label_year_selection_formatter">%d年</string>
+    <string name="label_second">%s秒</string>
+</resources>
