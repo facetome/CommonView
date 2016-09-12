@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-
 import com.basic.commonview.R;
 import com.basic.commonview.datePicker.WheelView.CurrentItemListener;
 import com.basic.commonview.datePicker.adapter.AbstractWheelTextAdapter;
@@ -88,9 +87,9 @@ public class DatePickerView extends LinearLayout implements CurrentItemListener 
     private CustomizationMaxItemWheelAdapter mHourWheelAdapter;
     private CustomizationMaxItemWheelAdapter mMinuteWheelAdapter;
     private SecondWheelAdapter mSecondWheelAdapter;
-    private Calendar mCalendar = Calendar.getInstance();
-    private Calendar mMaxTimeCalendar = Calendar.getInstance();
-    private Calendar mMinTimeCalender = Calendar.getInstance();
+    private Calendar mCalendar;
+    private Calendar mMaxTimeCalendar;
+    private Calendar mMinTimeCalender;
     private static final int DEFAULT_START_YEAR = 1970;
     private static final int NUMBER_TEN = 10;
     private int mStartYear;
@@ -98,6 +97,7 @@ public class DatePickerView extends LinearLayout implements CurrentItemListener 
     private long mMaxTime;
     private long mMinTime;
     private int mStyleType;
+    private boolean mFirstInit = false;
 
     /**
      * Constructor.
@@ -141,6 +141,11 @@ public class DatePickerView extends LinearLayout implements CurrentItemListener 
     }
 
     private void initDefaultWheel(long second, int styleType) {
+        //避免由于直接放在布局中使用时，每次调用visiable 方法而导致pickerView不是真正的初始化.
+        mFirstInit = true;
+        mCalendar = Calendar.getInstance();
+        mMaxTimeCalendar = Calendar.getInstance();
+        mMinTimeCalender = Calendar.getInstance();
         mTextColor = getResources().getColor(R.color.C5);
         mAxisTextColor = getResources().getColor(R.color.C1);
         setOrientation(HORIZONTAL);
@@ -198,7 +203,7 @@ public class DatePickerView extends LinearLayout implements CurrentItemListener 
                 }
                 break;
         }
-
+        mFirstInit = false;
     }
 
     private void initYear(int startYear, int endYear) {
@@ -402,12 +407,16 @@ public class DatePickerView extends LinearLayout implements CurrentItemListener 
             mMonthWheelAdapter.updateViewItem(maxMonth, minMonth - 1);
             int monthPosition = monthWheel.getCurrentItem() + mMonthWheelAdapter.getUnShowCount();
             if (mMonthWheelAdapter.getItemsCount() - 1 <= monthPosition) {
-                monthPosition = mMonthWheelAdapter.getItemsCount() - 1;
-                monthWheel.setCurrentItem(monthPosition);
+                 if (mFirstInit) {
+                    monthPosition = monthWheel.getCurrentItem();
+                } else {
+                    monthPosition = mMonthWheelAdapter.getItemsCount() - 1;
+                    monthWheel.setCurrentItem(monthPosition);
+                }
                 monthPosition += mMonthWheelAdapter.getUnShowCount();
-                mCalendar.set(Calendar.MONTH, monthPosition);
             }
             onMonthChanged(monthPosition);
+            monthWheel.invalidateWheel(true); //刷新滚轮
         }
     }
 
@@ -444,12 +453,16 @@ public class DatePickerView extends LinearLayout implements CurrentItemListener 
             mDayWheelAdapter.updateViewItem(maxDay, minDay - 1);
             int dayPosition = dayWheel.getCurrentItem() + mDayWheelAdapter.getUnShowCount();
             if (mDayWheelAdapter.getItemsCount() - 1 <= dayPosition) {
-                dayPosition = mDayWheelAdapter.getItemsCount() - 1;
-                dayWheel.setCurrentItem(dayPosition);
+                if (mFirstInit) {
+                    dayPosition = dayWheel.getCurrentItem();
+                } else {
+                    dayPosition = mDayWheelAdapter.getItemsCount() - 1;
+                    dayWheel.setCurrentItem(dayPosition);
+                }
                 dayPosition += mDayWheelAdapter.getUnShowCount();
-                mCalendar.set(Calendar.DAY_OF_MONTH, dayPosition + 1);
             }
             onDayChanged(dayPosition);
+            dayWheel.invalidateWheel(true); //刷新滚轮
         }
     }
 
@@ -464,10 +477,13 @@ public class DatePickerView extends LinearLayout implements CurrentItemListener 
             mHourAndMinuteWheelAdapter.updateViewItem(maxHour + 1, minHour);
             int hourPosition = hourAndMinuteWheel.getCurrentItem() + mHourAndMinuteWheelAdapter.getUnShowCount();
             if (mHourAndMinuteWheelAdapter.getItemsCount() - 1 <= hourPosition) {
-                hourPosition = mHourAndMinuteWheelAdapter.getItemsCount() - 1;
-                hourAndMinuteWheel.setCurrentItem(hourPosition);
+                if (mFirstInit) {
+                    hourPosition = hourAndMinuteWheel.getCurrentItem();
+                } else {
+                    hourPosition = mHourAndMinuteWheelAdapter.getItemsCount() - 1;
+                    hourAndMinuteWheel.setCurrentItem(hourPosition);
+                }
                 hourPosition += mHourAndMinuteWheelAdapter.getUnShowCount();
-                mCalendar.set(Calendar.HOUR_OF_DAY, hourPosition);
             }
             mCalendar.set(Calendar.HOUR_OF_DAY, hourPosition);
         }
@@ -487,8 +503,12 @@ public class DatePickerView extends LinearLayout implements CurrentItemListener 
             mMinuteWheelAdapter.updateViewItem(maxMinute + 1, minMinute);
             int minutePosition = minuteView.getCurrentItem() + mMinuteWheelAdapter.getUnShowCount();
             if (minutePosition >= mMinuteWheelAdapter.getItemsCount() - 1) {
-                minutePosition = mMinuteWheelAdapter.getItemsCount() - 1;
-                minuteView.setCurrentItem(minutePosition);
+                if (mFirstInit) {
+                    minutePosition = minuteView.getCurrentItem();
+                } else {
+                    minutePosition = mMinuteWheelAdapter.getItemsCount() - 1;
+                    minuteView.setCurrentItem(minutePosition);
+                }
                 minutePosition += mMinuteWheelAdapter.getUnShowCount();
             }
             mCalendar.set(Calendar.MINUTE, minutePosition);
@@ -626,6 +646,22 @@ public class DatePickerView extends LinearLayout implements CurrentItemListener 
     public void initDataPicker(long second, int styleType) {
         initDefaultWheel(second, styleType);
         postInvalidate();
+    }
+
+    /**
+     * 回收pickerView，在布局中使用该控件，用visiable 方法实现datePicker的显示时必须调用该方法.
+     */
+    public void recycle() {
+        mMonthWheelAdapter = null;
+        mHourWheelAdapter = null;
+        mDayWheelAdapter = null;
+        mYearWheelAdapter = null;
+        mHourAndMinuteWheelAdapter = null;
+        mSecondWheelAdapter = null;
+        mCalendar = null;
+        mMaxTimeCalendar = null;
+        mMinTimeCalender = null;
+        mWheelViewMap.clear();
     }
 
     @Override

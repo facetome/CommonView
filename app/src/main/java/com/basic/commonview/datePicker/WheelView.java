@@ -165,6 +165,7 @@ public class WheelView extends View {
      */
     private void initData(Context context) {
         mScroller = new WheelScroller(getContext(), mScrollingListener);
+
     }
 
     // Scrolling listener
@@ -268,6 +269,7 @@ public class WheelView extends View {
         mViewAdapter = viewAdapter;
         if (mViewAdapter != null) {
             mViewAdapter.registerDataSetObserver(mDataObserver);
+
         }
 
         invalidateWheel(true);
