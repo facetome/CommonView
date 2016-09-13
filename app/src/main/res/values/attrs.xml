@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="wheelViewPicker">
+        <attr name="textSize" format="dimension" />
+        <attr name="axisTextSize" format="dimension" />
+        <attr name="textColor" format="color" />
+        <attr name="axisTextColor" format="color" />
+    </declare-styleable>
+
+    <!--自定义viewPager属性    -->
+    <declare-styleable name="CustomViewPager">
+        <attr name="enableSwitchByGesture" format="boolean" />
+    </declare-styleable>
+
+    <!--广告条自定义属性-->
+    <declare-styleable name="ViewPagerContainer">
+        <attr name="pager_factor" format="float" />
+    </declare-styleable>
+</resources>

@@ -1,5 +1,6 @@
 package com.basic.commonview.util;
 
+import android.content.Context;
 import android.text.format.DateUtils;
 
 import java.util.Calendar;
@@ -77,5 +78,15 @@ public final class Utility {
         calendar.set(Calendar.SECOND, 0);
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar;
+    }
+
+    /**
+     * 获取屏幕宽度.
+     *
+     * @param context
+     * @return
+     */
+    public static int getScreenWidth(Context context) {
+        return context.getResources().getDisplayMetrics().widthPixels;
     }
 }

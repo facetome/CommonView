@@ -6,11 +6,4 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
-    <declare-styleable name="wheelViewPicker">
-        <attr name="textSize" format="dimension" />
-        <attr name="axisTextSize" format="dimension" />
-        <attr name="textColor" format="color" />
-        <attr name="axisTextColor" format="color" />
-    </declare-styleable>
 </resources>
